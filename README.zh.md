@@ -6,6 +6,8 @@
   <img src="https://img.shields.io/badge/Platform-PlatformIO-orange" alt="PlatformIO">
 </p>
 
+*[English](README.md) | [中文](README.zh.md)*
+
 > ⚠️ **免责声明**: 本项目仅供学习和娱乐目的。作者不对任何非法使用、恶意活动或任何令人感到不适的使用负责。请负责任地使用并遵守当地法律法规。
 
 ## 功能特点
@@ -31,7 +33,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/ssidspam.git
+git clone https://github.com/tatanakots/ssidspam.git
 cd ssidspam
 
 # 编译项目
@@ -110,9 +112,9 @@ data/
 
 ## 预编译固件
 
-预编译固件可在 [Releases](https://github.com/yourusername/ssidspam/releases) 页面获取。
+预编译固件可在 [Releases](https://github.com/tatanakots/ssidspam/releases) 页面获取。
 
-也可以在 [Actions](https://github.com/yourusername/ssidspam/actions) 选项卡中找到自动化构建。
+也可以在 [Actions](https://github.com/tatanakots/ssidspam/actions) 选项卡中找到自动化构建。
 
 ## 故障排除
 

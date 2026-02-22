@@ -6,6 +6,8 @@
   <img src="https://img.shields.io/badge/Platform-PlatformIO-orange" alt="PlatformIO">
 </p>
 
+*[English](README.md) | [中文](README.zh.md)*
+
 > ⚠️ **Disclaimer**: This project is for educational and entertainment purposes only. The author is not responsible for any illegal use, malicious activities, or any use that causes discomfort to others. Please use responsibly and in compliance with local laws and regulations.
 
 ## Features
@@ -31,7 +33,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ssidspam.git
+git clone https://github.com/tatanakots/ssidspam.git
 cd ssidspam
 
 # Build the project
@@ -110,9 +112,9 @@ data/
 
 ## Pre-built Binaries
 
-Pre-built firmware binaries are available in the [Releases](https://github.com/yourusername/ssidspam/releases) page.
+Pre-built firmware binaries are available in the [Releases](https://github.com/tatanakots/ssidspam/releases) page.
 
-You can also find automated builds in the [Actions](https://github.com/yourusername/ssidspam/actions) tab.
+You can also find automated builds in the [Actions](https://github.com/tatanakots/ssidspam/actions) tab.
 
 ## Troubleshooting
 
