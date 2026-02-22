@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.tag.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Bump version and create tag
+        id: tag
+        uses: anothrNick/github-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: ${{ inputs.bump }}
+          TAG_PREFIX: v
+          RELEASE_BRANCHES: master,main
+
+  build:
+    needs: bump-version
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+
+  publish:
+    needs: [bump-version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v6
+        with:
+          name: esp32-firmware
+          path: release/
+
+      - name: Package assets
+        run: |
+          cd release
+          # Only include existing files in zip
+          zip -j ../firmware.zip bootloader.bin partitions.bin firmware.bin spiffs.bin 2>/dev/null || \
+          zip -j ../firmware.zip bootloader.bin partitions.bin firmware.bin
+
+      - name: Publish GitHub Release (bin files)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.bump-version.outputs.new_tag }}
+          name: Release ${{ needs.bump-version.outputs.new_tag }}
+          generate_release_notes: true
+          files: |
+            release/bootloader.bin
+            release/partitions.bin
+            release/firmware.bin
+
+      - name: Upload spiffs.bin if exists
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.bump-version.outputs.new_tag }}
+          files: release/spiffs.bin
+        continue-on-error: true
+
+      - name: Publish firmware.zip
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.bump-version.outputs.new_tag }}
+          files: firmware.zip

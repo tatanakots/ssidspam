@@ -1,0 +1,7 @@
+{
+    "security": 4,
+    "channel": 6,
+    "mac_prefix": [2, 17, 34, 51, 68],
+    "beacon_interval": 100,
+    "serial_baud": 115200
+}

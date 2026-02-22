@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install PlatformIO
+        run: |
+          pip install --upgrade platformio
+
+      - name: Build firmware
+        run: pio run
+
+      - name: Build filesystem (optional)
+        run: pio run --target buildfs
+        continue-on-error: true
+
+      - name: Create artifacts directory
+        run: |
+          mkdir -p artifacts
+          cp .pio/build/esp32dev/bootloader.bin artifacts/ 2>/dev/null || true
+          cp .pio/build/esp32dev/partitions.bin artifacts/ 2>/dev/null || true
+          cp .pio/build/esp32dev/firmware.bin artifacts/ 2>/dev/null || true
+          cp .pio/build/esp32dev/spiffs.bin artifacts/ 2>/dev/null || true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: esp32-firmware
+          path: artifacts/
+          retention-days: 30
