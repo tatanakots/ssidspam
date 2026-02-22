@@ -116,6 +116,72 @@ Pre-built firmware binaries are available in the [Releases](https://github.com/t
 
 You can also find automated builds in the [Actions](https://github.com/tatanakots/ssidspam/actions) tab.
 
+## Factory Flash Guide
+
+This section describes how to flash pre-built firmware for factory production using `esptool.py`.
+
+### Partition Layout (minimal.csv - Single OTA)
+
+| Binary | Offset | Description |
+|--------|--------|-------------|
+| bootloader.bin | 0x1000 | ESP32 bootloader |
+| partitions.bin | 0x8000 | Partition table |
+| firmware.bin | 0x10000 | Main application |
+| littlefs.bin | 0x150000 | LittleFS filesystem (config) |
+
+> **Note**: The LittleFS offset is 0x150000 for 4MB flash with minimal.csv. Adjust if using different flash size.
+
+### Required Files
+
+After building, the following files are generated in `.pio/build/esp32dev/`:
+
+- `bootloader.bin` - ESP32 bootloader
+- `partitions.bin` - Partition table
+- `firmware.bin` - Compiled application
+- `littlefs.bin` - Filesystem image (contains `settings.json` and `ssid.json`)
+
+### Flash Commands
+
+```bash
+# Flash all components
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 \
+  write_flash 0x1000 .pio/build/esp32dev/bootloader.bin \
+  0x8000 .pio/build/esp32dev/partitions.bin \
+  0x10000 .pio/build/esp32dev/firmware.bin \
+  0x150000 .pio/build/esp32dev/littlefs.bin
+
+# Or flash only firmware (if bootloader/partition unchanged)
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 \
+  write_flash 0x10000 .pio/build/esp32dev/firmware.bin
+```
+
+### Windows Example
+
+```powershell
+# Using COM3 as example port
+esptool.exe --chip esp32 --port COM3 --baud 460800 write_flash 0x1000 .pio\build\esp32dev\bootloader.bin 0x8000 .pio\build\esp32dev\partitions.bin 0x10000 .pio\build\esp32dev\firmware.bin 0x150000 .pio\build\esp32dev\littlefs.bin
+```
+
+### Using GitHub Actions
+
+The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) that automatically builds the firmware on every push and pull request.
+
+**How to use:**
+
+1. Fork this repository
+2. Go to **Actions** tab in your GitHub repository
+3. Select the **Build** workflow
+4. Click **Run workflow**
+5. After completion, download artifacts from the workflow run
+
+The workflow generates the following artifacts:
+- `bootloader.bin` - ESP32 bootloader
+- `partitions.bin` - Partition table  
+- `firmware.bin` - Compiled application
+- `littlefs.bin` - Filesystem image
+
+You can also download pre-built binaries from the [Actions](https://github.com/tatanakots/ssidspam/actions) page - click on a completed workflow run and scroll down to "Artifacts".
+
 ## Troubleshooting
 
 ### Serial Monitor

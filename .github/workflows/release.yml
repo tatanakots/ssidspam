@@ -68,11 +68,11 @@ jobs:
             release/partitions.bin
             release/firmware.bin
 
-      - name: Upload spiffs.bin if exists
+      - name: Upload littlefs.bin if exists
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.bump-version.outputs.new_tag }}
-          files: release/spiffs.bin
+          files: release/littlefs.bin
         continue-on-error: true
 
       - name: Publish firmware.zip

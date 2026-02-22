@@ -116,6 +116,72 @@ data/
 
 也可以在 [Actions](https://github.com/tatanakots/ssidspam/actions) 选项卡中找到自动化构建。
 
+## 工厂烧录指南
+
+本节介绍如何使用 `esptool.py` 烧录预编译固件用于工厂生产。
+
+### 分区布局 (minimal.csv - 单OTA)
+
+| 二进制文件 | 偏移地址 | 说明 |
+|-----------|----------|------|
+| bootloader.bin | 0x1000 | ESP32 启动引导程序 |
+| partitions.bin | 0x8000 | 分区表 |
+| firmware.bin | 0x10000 | 主应用程序 |
+| littlefs.bin | 0x150000 | LittleFS 文件系统（配置） |
+
+> **注意**: LittleFS 偏移地址 0x150000 适用于 4MB 闪存使用 minimal.csv 的配置。如使用不同闪存大小请调整。
+
+### 所需文件
+
+编译完成后，以下文件生成在 `.pio/build/esp32dev/` 目录：
+
+- `bootloader.bin` - ESP32 启动引导程序
+- `partitions.bin` - 分区表
+- `firmware.bin` - 编译后的应用程序
+- `littlefs.bin` - 文件系统镜像（包含 `settings.json` 和 `ssid.json`）
+
+### 烧录命令
+
+```bash
+# 烧录所有组件
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 \
+  write_flash 0x1000 .pio/build/esp32dev/bootloader.bin \
+  0x8000 .pio/build/esp32dev/partitions.bin \
+  0x10000 .pio/build/esp32dev/firmware.bin \
+  0x150000 .pio/build/esp32dev/littlefs.bin
+
+# 仅烧录固件（如果引导程序/分区未更改）
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 \
+  write_flash 0x10000 .pio/build/esp32dev/firmware.bin
+```
+
+### Windows 示例
+
+```powershell
+# 以 COM3 为例
+esptool.exe --chip esp32 --port COM3 --baud 460800 write_flash 0x1000 .pio\build\esp32dev\bootloader.bin 0x8000 .pio\build\esp32dev\partitions.bin 0x10000 .pio\build\esp32dev\firmware.bin 0x150000 .pio\build\esp32dev\littlefs.bin
+```
+
+### 使用 GitHub Actions
+
+项目包含 GitHub Actions 工作流 (`.github/workflows/build.yml`)，会在每次推送和拉取请求时自动构建固件。
+
+**使用方法：**
+
+1. Fork 此仓库
+2. 进入 GitHub 仓库的 **Actions** 选项卡
+3. 选择 **Build** 工作流
+4. 点击 **Run workflow**
+5. 完成后，从工作流运行中下载产物
+
+工作流生成以下产物：
+- `bootloader.bin` - ESP32 启动引导程序
+- `partitions.bin` - 分区表
+- `firmware.bin` - 编译后的应用程序
+- `littlefs.bin` - 文件系统镜像
+
+您也可以从 [Actions](https://github.com/tatanakots/ssidspam/actions) 页面下载预编译的二进制文件 - 点击已完成的 workflow 运行，向下滚动到 "Artifacts"。
+
 ## 故障排除
 
 ### 串口监视器
